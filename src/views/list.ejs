@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<%- include('partials/head.ejs') %>
+
+<body>
+
+  <h1><%= title %></h1>
+
+  <%- include('partials/navbar.ejs') %>
+
+  <ul>
+    <% users.forEach((user) => { %>
+    <li>
+      <%= user.name %> - <%= user.email %> - Idade: <%= user.age %> -
+      <a href="/register/edit?id=<%= user.id %>">[editar]</a> -
+      <a href="/register/remove/<%= user.id %>"
+        onclick="if(confirm('Deseja realmente remover o cliente?')) { return true; } else { return false; }">[remover]</a>
+    </li>
+    <% }) %>
+  </ul>
+
+
+  <%- include('partials/footer.ejs') %>
+</body>
+
+</html>
