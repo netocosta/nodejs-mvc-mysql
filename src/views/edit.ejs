@@ -17,6 +17,10 @@
   <%= message %><br /><br />
   <% } %>
 
+  <% if (!user) { %>
+  Usuário inexistente.<br /><br />
+  <% } else { %>
+
   <form action="/register/edit/<%= user.id %>" method="POST">
     <div>
       <label>Nome</label>
@@ -32,6 +36,8 @@
     </div>
     <button type="submit">Editar</button>
   </form>
+
+  <% } %>
 
   <%- include('partials/footer.ejs') %>
 </body>

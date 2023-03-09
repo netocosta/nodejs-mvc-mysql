@@ -1,27 +1,42 @@
-var conn = require('../database')
+var connection = require('../database')
 
-function select(query, callback) {
-  conn.query(query, function (err, rows) {
-    callback(err, rows)
-  })
+const table = 'customers'
+
+async function find() {
+  const db = await connection()
+  const result = await db.query(`SELECT * FROM ${table}`)
+  await db.end()
+  return result
 }
 
-function insert(query, params, callback) {
-  conn.query(query, params, function (err, rows) {
-    callback(err, rows)
-  })
+async function findOne(params) {
+  const db = await connection()
+  const result = await db.query(`SELECT * FROM ${table} WHERE ?`, params)
+  await db.end()
+  return result[0]
 }
 
-function update(query, params, callback) {
-  conn.query(query, params, function (err, rows) {
-    callback(err, rows)
-  })
+async function create(params) {
+  const db = await connection()
+  const result = await db.query(`INSERT INTO ${table} SET ?`, params)
+  await db.end()
+  return result
 }
 
-function remove(query, callback) {
-  conn.query(query, function (err, rows) {
-    callback(err, rows)
-  })
+async function update(id, params) {
+  const db = await connection()
+  const result = await db.query(`UPDATE ${table} SET ? WHERE ID=${id}`, params)
+  await db.end()
+
+  return result
 }
 
-module.exports = { select, insert, update, remove }
+async function destroy(id) {
+  const db = await connection()
+  const result = await db.query(`DELETE FROM ${table} WHERE ID=${id}`)
+  await db.end()
+
+  return result
+}
+
+module.exports = { find, findOne, create, update, destroy }

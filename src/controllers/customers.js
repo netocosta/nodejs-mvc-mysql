@@ -1,23 +1,19 @@
 const CustomersModel = require('../models/customers');
 const { crypto } = require('../utils/password')
 
-const defaultTitle = 'Cadastro de Clientes'
-const table = 'customers'
-
 async function list(req, res) {
-  CustomersModel.select(`SELECT * FROM ${table}`, function (error, result) {
-    if (error) { throw error }
+  const users = await CustomersModel.find()
 
-    res.render('list', {
-      title: 'Listagem de Clientes',
-      users: result,
-    })
+  res.render('list', {
+    title: 'Listagem de Clientes',
+    users,
   })
+
 }
 
 function addForm(req, res) {
   res.render('register', {
-    title: defaultTitle
+    title: 'Cadastro de Clientes',
   })
 }
 
@@ -33,35 +29,35 @@ async function addAction(req, res) {
     password: passwordCrypto,
   }
 
-  CustomersModel.insert(`INSERT INTO ${table} SET ?`, params, function (error, results, fields) {
-    if (error) {
-      console.log("Erro: " + error)
-    }
+  const result = CustomersModel.create(params)
 
-    res.render('register', {
-      title: defaultTitle,
-      message: 'Cadastro realizado com sucesso'
-    })
+  if (result.affectedRows === 1) {
+    message = 'Cadastro realizado com sucesso'
+  } else {
+    message = 'Deu erro moral'
+  }
+
+  res.render('edit', {
+    title: 'Cadastro de Clientes',
+    message: message
   })
 }
 
 async function editForm(req, res) {
   const { id } = req.query
 
-  CustomersModel.select(`SELECT * FROM ${table} WHERE id=${id}`, function (error, result) {
-    if (error) { throw error }
+  const user = await CustomersModel.findOne({ id })
 
-    res.render('edit', {
-      title: 'Editar Usuario',
-      user: result[0],
-    })
-
+  res.render('edit', {
+    title: 'Editar Usuario',
+    user: user,
   })
 }
 
 async function editAction(req, res) {
   const { name, age, email } = req.body
   const { id } = req.params
+  let message = ''
 
   const params = {
     name: name,
@@ -69,36 +65,28 @@ async function editAction(req, res) {
     email: email
   }
 
-  CustomersModel.update(`UPDATE ${table} SET ? WHERE ID=${id}`, params, function (error, results, fields) {
-    if (error) {
-      console.log("Erro: " + error)
-    }
+  const result = await CustomersModel.update(id, params)
+  const user = await CustomersModel.findOne({ id })
 
-    CustomersModel.select(`SELECT * FROM ${table} WHERE id=${id}`, function (error, result) {
-      if (error) { throw error }
+  if (result.affectedRows === 1) {
+    message = 'Usuario atualizado com sucesso'
+  } else {
+    message = 'Deu erro moral'
+  }
 
-      res.render('edit', {
-        title: 'Editar Usuario',
-        user: result[0],
-        message: 'Usuario atualizado com sucesso'
-      })
-
-    })
-
+  res.render('edit', {
+    title: 'Editar Usuario',
+    user: user,
+    message: message
   })
 }
 
 async function removeAction(req, res) {
   const { id } = req.params
 
-  CustomersModel.remove(`DELETE FROM ${table} WHERE ID=${id}`, function (error, results, fields) {
-    if (error) {
-      console.log("Erro: " + error)
-    }
+  const user = await CustomersModel.destroy(id)
 
-    res.redirect('/list')
-  })
-
+  res.redirect('/list')
 }
 
 module.exports = {
