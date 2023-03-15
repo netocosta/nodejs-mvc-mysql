@@ -29,7 +29,7 @@ async function addAction(req, res) {
     password: passwordCrypto,
   }
 
-  const result = CustomersModel.create(params)
+  const result = await CustomersModel.create(params)
 
   if (result.affectedRows === 1) {
     message = 'Cadastro realizado com sucesso'
